@@ -1,0 +1,27 @@
+{
+  "name": "bouncer",
+  "version": "0.0.1",
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "clean": "rm -rf coverage/ node_modules/.cache/",
+    "lint": "standard '{src,test}/**/*.mjs'|snazzy",
+    "format": "prettier-standard '{src,test}/**/*.mjs'",
+    "test": "c8 uvu",
+    "coverage": "npm run test && c8 report --reporter=html && sirv coverage/ -p 8000 -H"
+  },
+  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ludlovian/bouncer.git"
+  },
+  "author": "",
+  "license": "Unlicense",
+  "dependencies": {
+    "timer": "github:ludlovian/timer"
+  },
+  "devDependencies": {
+    "debug": "^4.3.4",
+    "uvu": "^0.5.6"
+  }
+}
