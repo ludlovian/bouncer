@@ -158,4 +158,48 @@ test('repeater without leading edge', async () => {
   assert.is(b._tm.active, false, '7: *internal* interval turned off')
 })
 
+test('.stop on waiter', async () => {
+  let calls = 0
+  const b = new Bouncer({
+    after: 30,
+    leading: false,
+    fn: () => calls++
+  })
+
+  b.fire()
+  assert.is(calls, 0, '1: no initial call made')
+
+  await delay(20)
+  assert.is(calls, 0, '2: no call made as quiet period too short')
+
+  b.stop()
+
+  await delay(20)
+  assert.is(calls, 0, '3: no call made as bouncer was stopped')
+})
+
+test('.stop on repeater', async () => {
+  let calls = 0
+  const b = new Bouncer({
+    every: 30,
+    fn: () => calls++
+  })
+
+  b.fire()
+
+  assert.is(calls, 1, '1: inital call made')
+
+  await delay(20)
+
+  b.fire()
+
+  assert.is(calls, 1, '2: no call made yet')
+
+  b.stop()
+
+  await delay(20)
+
+  assert.is(calls, 1, '3: no call made as bouncer was stopped')
+})
+
 test.run()

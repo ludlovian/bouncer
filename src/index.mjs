@@ -24,6 +24,11 @@ export default class Bouncer {
   }
 
   _fire () {
+  stop () {
+    this._tm.cancel()
+    return this
+  }
+
     const tm = this._tm
     if (this._waiter) {
       if (tm.active) {

@@ -39,7 +39,7 @@ Creates a new bouncer with the requested options. See **Options** below
 ### .set(opts) => Bouncer
 `bouncer.set({...})`
 
-Reconfigures the bouncer, returnsing itself for chaining. See **Options** below
+Reconfigures the bouncer, returning itself for chaining. See **Options** below
 
 ### .after(ms) => Bouncer
 
@@ -56,6 +56,13 @@ The debounced/throttled function that users should call.
 
 Like all good bouncers, they accept no arguments.
 Go elsewhere if you need closure.
+
+### .stop() => Bouncer
+
+Cancels any outstanding timers, so no further calls will be made to the
+underlying function.
+
+Of course, if you call `fire` again, it will start up.
 
 ### Options
 
