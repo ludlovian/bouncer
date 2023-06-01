@@ -9,7 +9,7 @@ export default class Bouncer {
   }
 
   get fire () {
-    return this._fire.bind(this)
+    return (this._waiter ? this._fireWaiter : this._fireRepeater).bind(this)
   }
 
   after (ms) {
@@ -23,43 +23,51 @@ export default class Bouncer {
     this.leading = true
   }
 
-  _fire () {
   stop () {
     this._tm.cancel()
     return this
   }
 
+  //
+  // Internal implementation
+  //
+  // Waiters - wait for a quiescent period before calling
+  //
+
+  _fireWaiter () {
     const tm = this._tm
-    if (this._waiter) {
-      if (tm.active) {
-        tm.after(this._ms)
-      } else {
-        if (this.leading && this.fn) this.fn()
-        tm.set({ after: this._ms, fn: this._tickWaiter.bind(this) })
-      }
+    if (!tm.active) {
+      if (this.leading && this.fn) this.fn()
+      tm.set({
+        after: this._ms,
+        fn: () => {
+          if (this.fn) this.fn()
+        }
+      })
     } else {
-      if (tm.active) {
-        this._called = true
-      } else {
-        if (this.leading && this.fn) this.fn()
-        tm.set({ every: this._ms, fn: this._tickRepeater.bind(this) })
-        this._called = false
-      }
+      tm.after(this._ms)
     }
   }
 
-  _tickWaiter () {
-    this._tm.cancel()
-    if (this.fn) this.fn()
-  }
+  //
+  // Repeaters - call on schedule until we have a quiet period
 
-  _tickRepeater () {
-    if (!this._called) {
-      this._tm.cancel()
+  _fireRepeater () {
+    const tm = this._tm
+    if (!tm.active) {
+      if (this.leading && this.fn) this.fn()
+      tm.set({
+        every: this._ms,
+        fn: () => {
+          if (!this._called) return tm.cancel()
+          if (this.fn) this.fn()
+          this._called = false
+        }
+      })
+      this._called = false
     } else {
-      if (this.fn) this.fn()
+      this._called = true
     }
-    this._called = false
   }
 }
 
