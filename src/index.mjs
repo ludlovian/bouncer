@@ -6,10 +6,11 @@ export default class Bouncer {
     this._tm = new Timer()
     // ssensible defaults
     this.set({ after: 500, ...opts })
+    this.fire = this.fire.bind(this)
   }
 
-  get fire () {
-    return (this._waiter ? this._fireWaiter : this._fireRepeater).bind(this)
+  fire () {
+    return this._waiter ? this._fireWaiter() : this._fireRepeater()
   }
 
   after (ms) {
