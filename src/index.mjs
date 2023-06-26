@@ -42,13 +42,13 @@ export default class Bouncer {
   _fireWaiter () {
     const tm = this._tm
     if (!tm.active) {
-      if (this.leading && this.fn) this.fn()
       tm.set({
         after: this._ms,
         fn: () => {
           if (this.fn) this.fn()
         }
       })
+      if (this.leading && this.fn) this.fn()
     } else {
       tm.after(this._ms)
     }
@@ -60,7 +60,6 @@ export default class Bouncer {
   _fireRepeater () {
     const tm = this._tm
     if (!tm.active) {
-      if (this.leading && this.fn) this.fn()
       tm.set({
         every: this._ms,
         fn: () => {
@@ -70,6 +69,7 @@ export default class Bouncer {
         }
       })
       this._called = false
+      if (this.leading && this.fn) this.fn()
     } else {
       this._called = true
     }

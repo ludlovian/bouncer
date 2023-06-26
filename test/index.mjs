@@ -208,4 +208,27 @@ test('.stop on repeater', async () => {
   assert.is(calls, 1, '3: no call made as bouncer was stopped')
 })
 
+test('allow waiter to be re-entrant', () => {
+  let i = 0
+  const b = new Bouncer()
+  const fn = () => {
+    if (++i > 10) throw new Error('Loop detected')
+    b.fire()
+  }
+  b.set({ after: 10, fn, leading: true })
+  b.fire()
+  b.stop()
+})
+
+test('allow repeater to be re-entrant', () => {
+  let i = 0
+  const b = new Bouncer()
+  const fn = () => {
+    if (++i > 10) throw new Error('Loop detected')
+    b.fire()
+  }
+  b.set({ every: 10, fn, leading: true })
+  b.fire()
+  b.stop()
+})
 test.run()
