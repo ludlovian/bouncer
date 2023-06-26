@@ -12,6 +12,10 @@ export default class Bouncer {
     return (this._waiter ? this._fireWaiter : this._fireRepeater).bind(this)
   }
 
+  get active () {
+    return this._tm.active
+  }
+
   after (ms) {
     this._ms = ms
     this._waiter = true

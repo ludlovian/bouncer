@@ -17,9 +17,11 @@ test('waiter with no leading edge', async () => {
     leading: false,
     fn: () => calls++
   })
+  assert.is(b.active, false, 'bouncer initially inactive')
 
   b.fire()
   assert.is(calls, 0, '1: no initial call made')
+  assert.is(b.active, true, 'bouncer now active')
 
   await delay(20)
   assert.is(calls, 0, '2: no call made as quiet period too short')
@@ -31,6 +33,7 @@ test('waiter with no leading edge', async () => {
 
   await delay(20)
   assert.is(calls, 1, '4: call made after quiet period')
+  assert.is(b.active, false, 'bouncer now inactive')
 
   await delay(50)
   assert.is(calls, 1, '5: no further calls made')
@@ -55,9 +58,11 @@ test('waiter with leading edge', async () => {
     fn: () => calls++
   })
 
+  assert.is(b.active, false, 'bouncer initially inactive')
   b.fire()
 
   assert.is(calls, 1, '1: initial call made')
+  assert.is(b.active, true, 'bouncer now active')
 
   await delay(20)
   assert.is(calls, 1, '2: no call made as quiet period too short')
@@ -69,6 +74,7 @@ test('waiter with leading edge', async () => {
 
   await delay(20)
   assert.is(calls, 2, '4: call made after quiet period')
+  assert.is(b.active, false, 'bouncer now inactive')
 
   await delay(50)
   assert.is(calls, 2, '5: no further calls made')
