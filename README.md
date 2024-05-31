@@ -34,20 +34,47 @@ Calls         ^     ^     ^     ^     .
 ### new Bouncer(opts) => Bouncer
 `bouncer = new Bouncer({...})`
 
-Creates a new bouncer with the requested options. See **Options** below
+Creates a new bouncer with the requested options.
 
-### .set(opts) => Bouncer
-`bouncer.set({...})`
+#### Configuration Options
 
-Reconfigures the bouncer, returning itself for chaining. See **Options** below
+Options are specified as an object with the following properties:
 
-### .after(ms) => Bouncer
+##### fn: () => void
 
-Same as `.set({ after: ms })`
+The underlying function you want to call. It takes no arguments, so use closures
 
-### .every(ms) => Bouncer
+##### after: milliseconds
 
-Same as `.set({ every: ms })`
+Makes the bouncer a _waiter_ style, who will call **once** things settle down.
+
+This is often referred to as a *debounce* style.
+
+Incompatible with `every`
+
+##### every: milliseconds
+
+`bouncer.every(ms)`
+
+Makes the bouncer a _repeater_ style, who will call regularly **until** things
+settle down.
+
+Often referred to as a *throttle* style.
+
+Incompatible with `after`
+
+##### leading: Boolean
+
+Should the bouncer call at the start of the activity as well?
+
+Default is `true` for _repeaters_  and `false` for _waiters_.
+
+### .after / .every / .leading / .fn
+
+Enumerable and read-only properties showing the current configuration.
+
+Can be useful for cloning a bouncer.
+`b2 = new Bouncer({ ...b1, fn: () => .... })`
 
 ### .fire: () => void
 `fnToCall = bouncer.fire`
@@ -57,42 +84,14 @@ The debounced/throttled function that users should call.
 Like all good bouncers, they accept no arguments.
 Go elsewhere if you need closure.
 
-### .stop() => Bouncer
+### .cancel() => Bouncer
 
 Cancels any outstanding timers, so no further calls will be made to the
 underlying function.
 
 Of course, if you call `fire` again, it will start up.
 
-### Options
+### .active => Boolean
 
-#### fn: () => void
-`bouncer.fn = () => {...}`
+Tells you if the bouncer is currently active
 
-The underling function to call
-
-### after: milliseconds
-`bouncer.after(ms)`
-
-Makes the bouncer a _waiter_ style, who will call **once** things settle down.
-
-This is often referred to as a *debounce* style.
-
-### every: milliseconds
-
-`bouncer.every(ms)`
-
-Makes the bouncer a _repeater_ style, who will call regularly **until** things
-settle down.
-
-Often referred to as a *throttle* style.
-
-### leading: Boolean
-```
-bouncer.leading = true
-bouncer.set({ fn, leading: true, every: ms })
-```
-
-Should the bouncer call at the start of the activity as well?
-
-Default is `true` for _repeaters_  and `false` for _waiters_.
