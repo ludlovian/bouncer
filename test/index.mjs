@@ -14,6 +14,21 @@ test('Bouncer', async t => {
     assert.strictEqual(b.after, after, 'after set properly')
     assert.strictEqual(b.fn, fn, 'fn set properly')
     assert.strictEqual(b.leading, false, 'leading set properly')
+
+    let copy = { ...b }
+    assert.deepStrictEqual(
+      copy,
+      { after, fn, leading: false },
+      'after - config attributes exposed'
+    )
+
+    const every = 31
+    copy = { ...new Bouncer({ every, fn }) }
+    assert.deepStrictEqual(
+      copy,
+      { every, fn, leading: true },
+      'every - config attributes exposed'
+    )
   })
 
   await t.test('waiter with no leading edge', async () => {
