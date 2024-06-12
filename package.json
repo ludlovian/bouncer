@@ -1,5 +1,5 @@
 {
-  "name": "bouncer",
+  "name": "@ludlovian/bouncer",
   "version": "2.0.1",
   "description": "",
   "exports": "./src/index.mjs",
@@ -18,6 +18,6 @@
   "author": "",
   "license": "Unlicense",
   "dependencies": {
-    "timer": "github:ludlovian/timer"
+    "@ludlovian/timer": "github:ludlovian/timer"
   }
 }

@@ -1,6 +1,6 @@
 import util from 'node:util'
 
-import Timer from 'timer'
+import Timer from '@ludlovian/timer'
 
 export default class Bouncer {
   // configuration
