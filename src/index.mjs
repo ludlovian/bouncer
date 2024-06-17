@@ -1,6 +1,6 @@
-import util from 'node:util'
-
 import Timer from '@ludlovian/timer'
+
+const customInspect = Symbol.for('nodejs.util.inspect.custom')
 
 export default class Bouncer {
   // configuration
@@ -36,7 +36,7 @@ export default class Bouncer {
   }
 
   /* c8 ignore start */
-  [util.inspect.custom] (depth, opts, inspect) {
+  [customInspect] (depth, opts, inspect) {
     if (depth < 0) {
       return opts.stylize('[Bouncer]', 'date')
     }
