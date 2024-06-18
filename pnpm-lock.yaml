@@ -10,14 +10,14 @@ importers:
     dependencies:
       '@ludlovian/timer':
         specifier: github:ludlovian/timer
-        version: https://codeload.github.com/ludlovian/timer/tar.gz/f5c021e191d528db5e573a07c358477c1ff5f80f
+        version: https://codeload.github.com/ludlovian/timer/tar.gz/4c595fc8071c4104036bbebc8d1cecdffaee7722
 
 packages:
 
-  '@ludlovian/timer@https://codeload.github.com/ludlovian/timer/tar.gz/f5c021e191d528db5e573a07c358477c1ff5f80f':
-    resolution: {tarball: https://codeload.github.com/ludlovian/timer/tar.gz/f5c021e191d528db5e573a07c358477c1ff5f80f}
-    version: 3.0.0
+  '@ludlovian/timer@https://codeload.github.com/ludlovian/timer/tar.gz/4c595fc8071c4104036bbebc8d1cecdffaee7722':
+    resolution: {tarball: https://codeload.github.com/ludlovian/timer/tar.gz/4c595fc8071c4104036bbebc8d1cecdffaee7722}
+    version: 3.0.1
 
 snapshots:
 
-  '@ludlovian/timer@https://codeload.github.com/ludlovian/timer/tar.gz/f5c021e191d528db5e573a07c358477c1ff5f80f': {}
+  '@ludlovian/timer@https://codeload.github.com/ludlovian/timer/tar.gz/4c595fc8071c4104036bbebc8d1cecdffaee7722': {}
