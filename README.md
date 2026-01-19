@@ -12,6 +12,9 @@ There are two styles of bouncers, _waiters_ and _repeaters_.
 
 A _waiter_ will wait until there is a defined period of quiet before allowing the
 function call to go ahead. Optionally they may allow a call at the start.
+
+This is also called _debouncing_.
+
 ```
 Activity -----X---X--X-X---X------------------
                             <---quiet-->
@@ -31,6 +34,8 @@ Calls         ^     ^     ^     ^     .
   optional leading                      no call made - shuts down
 ```
 
+This is also called _throttling_.
+
 ### new Bouncer(opts) => Bouncer
 `bouncer = new Bouncer({...})`
 
@@ -38,7 +43,10 @@ Creates a new bouncer with the requested options.
 
 #### Configuration Options
 
-Options are specified as an object with the following properties:
+Options are specified as an object with properties as below.
+
+If no configuration is supplied, an inactive default bouncer will be
+created, which can be reconfigured later.
 
 ##### fn: () => void
 
@@ -54,8 +62,6 @@ Incompatible with `every`
 
 ##### every: milliseconds
 
-`bouncer.every(ms)`
-
 Makes the bouncer a _repeater_ style, who will call regularly **until** things
 settle down.
 
@@ -69,6 +75,11 @@ Should the bouncer call at the start of the activity as well?
 
 Default is `true` for _repeaters_  and `false` for _waiters_.
 
+### .set(opts)
+
+Re-configures the bouncer as if it had been created with `new`. Any existing
+activity is cancelled.
+
 ### .after / .every / .leading / .fn
 
 Enumerable and read-only properties showing the current configuration.
@@ -79,7 +90,8 @@ Can be useful for cloning a bouncer.
 ### .fire: () => void
 `fnToCall = bouncer.fire`
 
-The debounced/throttled function that users should call.
+The debounced/throttled function that users should call. Already bound to
+the instance, so you can detach it.
 
 Like all good bouncers, they accept no arguments.
 Go elsewhere if you need closure.
@@ -89,7 +101,7 @@ Go elsewhere if you need closure.
 Cancels any outstanding timers, so no further calls will be made to the
 underlying function.
 
-Of course, if you call `fire` again, it will start up.
+Of course, if you call `.fire` again, it will start up.
 
 ### .active => Boolean
 

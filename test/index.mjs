@@ -1,12 +1,12 @@
-import test from 'node:test'
+import { suite, test, mock } from 'node:test'
 import assert from 'node:assert/strict'
 import { setTimeout as delay } from 'node:timers/promises'
 
 import Bouncer from '../src/index.mjs'
 
-test('Bouncer', async t => {
-  t.test('simple construction', () => {
-    const fn = t.mock.fn()
+suite('Bouncer', () => {
+  test('simple construction', () => {
+    const fn = mock.fn()
     const after = 30
     const b = new Bouncer({ after, fn })
 
@@ -18,7 +18,7 @@ test('Bouncer', async t => {
     let copy = { ...b }
     assert.deepStrictEqual(
       copy,
-      { after, fn, leading: false },
+      { after, every: undefined, fn, leading: false },
       'after - config attributes exposed'
     )
 
@@ -26,13 +26,28 @@ test('Bouncer', async t => {
     copy = { ...new Bouncer({ every, fn }) }
     assert.deepStrictEqual(
       copy,
-      { every, fn, leading: true },
+      { after: undefined, every, fn, leading: true },
       'every - config attributes exposed'
     )
   })
 
-  await t.test('waiter with no leading edge', async () => {
-    const fn = t.mock.fn()
+  test('default/empty construction', async () => {
+    const b = new Bouncer()
+    assert.equal(b.after, 0)
+    assert.equal(b.every, undefined)
+    assert.equal(b.leading, false)
+
+    assert.equal(b.active, false)
+    b.fire()
+    assert.equal(b.active, true)
+
+    await delay(5)
+
+    assert.equal(b.active, false)
+  })
+
+  test('waiter with no leading edge', async () => {
+    const fn = mock.fn()
     const after = 30
     const leading = false
     const b = new Bouncer({ fn, after, leading })
@@ -72,8 +87,8 @@ test('Bouncer', async t => {
     equal(calls(), 2, '8: no further calls() made')
   })
 
-  await t.test('waiter with leading edge', async () => {
-    const fn = t.mock.fn()
+  test('waiter with leading edge', async () => {
+    const fn = mock.fn()
     const after = 30
     const leading = true
     const b = new Bouncer({ fn, after, leading })
@@ -115,8 +130,8 @@ test('Bouncer', async t => {
     equal(calls(), 4, '9: no further calls made')
   })
 
-  await t.test('repeater with (default) leading edge', async () => {
-    const fn = t.mock.fn()
+  test('repeater with (default) leading edge', async () => {
+    const fn = mock.fn()
     const every = 30
     const b = new Bouncer({ fn, every })
     const calls = () => fn.mock.callCount()
@@ -150,8 +165,8 @@ test('Bouncer', async t => {
     equal(b.active, false, '7: No longer active')
   })
 
-  await t.test('repeater without leading edge', async () => {
-    const fn = t.mock.fn()
+  test('repeater without leading edge', async () => {
+    const fn = mock.fn()
     const every = 30
     const leading = false
     const b = new Bouncer({ fn, every, leading })
@@ -186,8 +201,8 @@ test('Bouncer', async t => {
     equal(b.active, false, '7: bouncer no longer active')
   })
 
-  await t.test('cancel a waiter', async () => {
-    const fn = t.mock.fn()
+  test('cancel a waiter', async () => {
+    const fn = mock.fn()
     const after = 30
     const leading = false
     const b = new Bouncer({ fn, after, leading })
@@ -208,8 +223,8 @@ test('Bouncer', async t => {
     equal(b.active, false, 'bouncer no longer active')
   })
 
-  await t.test('cancel a repeater', async () => {
-    const fn = t.mock.fn()
+  test('cancel a repeater', async () => {
+    const fn = mock.fn()
     const every = 30
     const b = new Bouncer({ fn, every })
     const calls = () => fn.mock.callCount()
@@ -233,7 +248,7 @@ test('Bouncer', async t => {
     equal(b.active, false, 'bouncer no longer active')
   })
 
-  await t.test('allow waiter to be re-entrant', async () => {
+  test('allow waiter to be re-entrant', async () => {
     let count = 0
     const after = 30
     const leading = true
@@ -251,7 +266,7 @@ test('Bouncer', async t => {
     b.cancel()
   })
 
-  await t.test('allow repeater to be re-entrant', async () => {
+  test('allow repeater to be re-entrant', async () => {
     let count = 0
     const every = 30
     const leading = true
@@ -268,9 +283,7 @@ test('Bouncer', async t => {
     b.cancel()
   })
 
-  t.test('Errors', t => {
-    assert.throws(() => new Bouncer(), Error, 'No data provided')
-
+  test('Errors', t => {
     assert.throws(
       () => new Bouncer({ after: 30, fn: 'function' }),
       /No function was supplied/,
@@ -290,8 +303,3 @@ test('Bouncer', async t => {
     )
   })
 })
-
-/*
-
-test.run()
-*/

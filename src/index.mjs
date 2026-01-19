@@ -2,9 +2,11 @@ import Timer from '@ludlovian/timer'
 
 const customInspect = Symbol.for('nodejs.util.inspect.custom')
 
+function doNothing () {}
+
 export default class Bouncer {
   // configuration
-  #timer = undefined
+  #timer = new Timer()
   #fn = undefined
   #after = undefined
   #every = undefined
@@ -13,7 +15,21 @@ export default class Bouncer {
   // state
   #called = false
 
-  constructor ({ fn, after, every, leading }) {
+  constructor (opts) {
+    this.#addProperties()
+    this.set(opts)
+  }
+
+  ['set'] ({
+    fn, // the function to call
+    after, // waiting-style
+    every, // repeater-style
+    leading
+  } = {}) {
+    // defaults
+    fn ??= doNothing
+    if (after === undefined && every === undefined) after = 0
+
     // validation of inputs
     if (typeof fn !== 'function') throw errNoFunctionSupplied()
     this.#fn = fn
@@ -21,17 +37,18 @@ export default class Bouncer {
     after = toInteger(after)
     every = toInteger(every)
 
-    if (after) {
+    if (!isNaN(after)) {
       this.#after = after
+      this.#every = undefined
       this.#leading = !!leading
-    } else if (every) {
+    } else if (!isNaN(every)) {
       this.#every = every
+      this.#after = undefined
       this.#leading = leading === undefined || !!leading
     } else {
       throw errNoDelaySupplied()
     }
 
-    this.#addProperties()
     this.#configureTimer()
   }
 
@@ -57,7 +74,7 @@ export default class Bouncer {
   }
 
   cancel () {
-    if (this.active) this.#timer.cancel()
+    this.#timer.cancel()
     return this
   }
 
@@ -65,83 +82,61 @@ export default class Bouncer {
     return this.#every !== undefined
   }
 
-  #fireRepeater () {
-    this.#called = true
-    if (!this.active) {
-      this.#timer.refresh()
-      if (this.#leading) this.#tickRepeater()
+  #fire () {
+    // called by users of the Bouncer
+    if (this.#isRepeater) {
+      this.#called = true
+      if (!this.active) {
+        this.#timer.refresh()
+        if (this.#leading) this.#tick()
+      }
+    } else {
+      if (!this.active) {
+        this.#timer.refresh()
+        if (this.#leading) this.#tick()
+      } else {
+        this.#timer.refresh()
+      }
     }
   }
 
-  #fireWaiter () {
-    if (!this.active) {
-      this.#timer.refresh()
-      if (this.#leading) this.#tickWaiter()
+  #tick () {
+    // called by the Bouncer's timer
+    if (this.#isRepeater) {
+      if (!this.#called) {
+        this.#timer.cancel()
+      } else {
+        this.#called = false
+        this.#fn()
+      }
     } else {
-      this.#timer.refresh()
-    }
-  }
-
-  #tickRepeater () {
-    if (!this.#called) {
-      this.#timer.cancel()
-    } else {
-      this.#called = false
       this.#fn()
     }
   }
 
-  #tickWaiter () {
-    this.#fn()
-  }
-
   #addProperties () {
     const enumerable = true
-    const configurable = true
-    const props = {}
-    props.fn = { enumerable, configurable, get: () => this.#fn }
-    props.leading = { enumerable, configurable, get: () => this.#leading }
-    props.fire = {
-      enumerable: false,
-      configurable,
-      value: this.#isRepeater
-        ? this.#fireRepeater.bind(this)
-        : this.#fireWaiter.bind(this),
-      writable: false
-    }
-
-    if (this.#every) {
-      props.every = { enumerable, configurable, get: () => this.#every }
-    }
-
-    if (this.#after) {
-      props.after = { enumerable, configurable, get: () => this.#after }
-    }
-
-    Object.defineProperties(this, props)
+    Object.defineProperties(this, {
+      fn: { enumerable, get: () => this.#fn },
+      leading: { enumerable, get: () => this.#leading },
+      every: { enumerable, get: () => this.#every },
+      after: { enumerable, get: () => this.#after },
+      fire: { value: this.#fire.bind(this) }
+    })
   }
 
   #configureTimer () {
-    if (this.#isRepeater) {
-      this.#timer = new Timer({
-        ms: this.#every,
-        repeat: true,
-        fn: this.#tickRepeater.bind(this)
-      })
-    } else {
-      this.#timer = new Timer({
-        ms: this.#after,
-        repeat: false,
-        fn: this.#tickWaiter.bind(this)
-      })
-    }
-    // Once configured cancel it until needed
-    this.#timer.cancel()
+    this.#timer.set({
+      fn: this.#tick.bind(this),
+      every: this.#every,
+      after: this.#after,
+      inactive: true
+    })
   }
 }
 
 function toInteger (n) {
-  n = Math.floor(n)
+  n = Math.max(0, Math.floor(n))
   return isNaN(n) ? undefined : n
 }
 
