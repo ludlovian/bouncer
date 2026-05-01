@@ -18,6 +18,6 @@
   "author": "",
   "license": "Unlicense",
   "dependencies": {
-    "@ludlovian/timer": "github:ludlovian/timer"
+    "@ludlovian/timer": "link:../timer"
   }
 }

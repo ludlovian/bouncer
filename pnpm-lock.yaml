@@ -9,15 +9,5 @@ importers:
   .:
     dependencies:
       '@ludlovian/timer':
-        specifier: github:ludlovian/timer
-        version: https://codeload.github.com/ludlovian/timer/tar.gz/078b147159ac6494d92f8cf4534604be965f070c
-
-packages:
-
-  '@ludlovian/timer@https://codeload.github.com/ludlovian/timer/tar.gz/078b147159ac6494d92f8cf4534604be965f070c':
-    resolution: {tarball: https://codeload.github.com/ludlovian/timer/tar.gz/078b147159ac6494d92f8cf4534604be965f070c}
-    version: 3.2.0
-
-snapshots:
-
-  '@ludlovian/timer@https://codeload.github.com/ludlovian/timer/tar.gz/078b147159ac6494d92f8cf4534604be965f070c': {}
+        specifier: link:../timer
+        version: link:../timer
